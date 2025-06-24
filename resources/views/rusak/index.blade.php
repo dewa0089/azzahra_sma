@@ -167,8 +167,13 @@
       });
     });
   });
+
   @if (Session::get('success'))
     toastr.success("{{ Session::get('success') }}");
+  @endif
+
+  @if (Session::get('delete_error'))
+    toastr.error("{{ Session::get('delete_error') }}");
   @endif
 </script>
 @endsection

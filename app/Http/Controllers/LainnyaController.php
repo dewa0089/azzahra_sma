@@ -42,8 +42,8 @@ class LainnyaController extends Controller
             'tgl_peroleh' => 'required',
             'asal_usul' => 'required',
             'cara_peroleh' => 'required',
-            'jumlah_brg' => 'required',
-            'harga_perunit' => 'required',
+            'jumlah_brg' => 'required|min:0',
+            'harga_perunit' => 'required|min:0',
             'total_harga' => 'nullable|numeric',
         ]);
 
@@ -71,8 +71,8 @@ class LainnyaController extends Controller
             'tgl_peroleh' => 'required',
             'asal_usul' => 'required',
             'cara_peroleh' => 'required',
-            'jumlah_brg' => 'required',
-            'harga_perunit' => 'required',
+            'jumlah_brg' => 'required|min:0',
+            'harga_perunit' => 'required|min:0',
             'total_harga' => 'nullable|numeric',
         ]);
 

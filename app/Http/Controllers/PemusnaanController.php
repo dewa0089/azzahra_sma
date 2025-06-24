@@ -39,9 +39,10 @@ class PemusnaanController extends Controller
         $rusak = Rusak::findOrFail($request->rusak_id);
 
         // ✅ Validasi tambahan agar jumlah tidak bisa dimanipulasi
-        if ((int) $request->jumlah_pemusnaan !== $rusak->jumlah_brg_rusak) {
-            return back()->withErrors(['jumlah_pemusnaan' => 'Jumlah pemusnaan harus sama dengan jumlah barang rusak.']);
-        }
+       if ((int) $request->jumlah_pemusnaan != (int) $rusak->jumlah_brg_rusak) {
+    return back()->withErrors(['jumlah_pemusnaan' => 'Jumlah pemusnaan harus sama dengan jumlah barang rusak.']);
+}
+
 
         if ($request->hasFile('gambar_pemusnaan')) {
             $tanggalPemusnaan = date('Ymd', strtotime($request->tanggal_pemusnaan));

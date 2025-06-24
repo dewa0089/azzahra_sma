@@ -35,11 +35,11 @@ class BarangController extends Controller
         $validated = $request->validate([
             'kode_barang' => 'required|unique:barangs',
             'nama_barang' => 'required',
-            'jumlah_barang' => 'required',
-            'jumlah_rusak' => 'nullable',
-            'jumlah_hilang' => 'nullable',
+            'jumlah_barang' => 'required|min:0',
+            'jumlah_rusak' => 'nullable|min:0',
+            'jumlah_hilang' => 'nullable|min:0',
             'tgl_peroleh' => 'required',
-            'harga_perunit' => 'required',
+            'harga_perunit' => 'required|min:0',
             'total_harga' => 'required',
         ]);
 
@@ -65,11 +65,11 @@ class BarangController extends Controller
         $validated = $request->validate([
             'kode_barang' => 'required|unique:barangs,kode_barang,' . $id,
             'nama_barang' => 'required',
-            'jumlah_barang' => 'required',
-            'jumlah_rusak' => 'nullable',
-            'jumlah_hilang' => 'nullable',
+            'jumlah_barang' => 'required|min:0',
+            'jumlah_rusak' => 'nullable|min:0',
+            'jumlah_hilang' => 'nullable|min:0',
             'tgl_peroleh' => 'required',
-            'harga_perunit' => 'required',
+            'harga_perunit' => 'required|min:0',
             'total_harga' => 'required',
         ]);
 

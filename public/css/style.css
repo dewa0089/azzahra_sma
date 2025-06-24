@@ -20728,7 +20728,7 @@ dl li {
   -webkit-transition: background 0.25s ease;
   -moz-transition: background 0.25s ease;
   -ms-transition: background 0.25s ease;
-  background: url(../images/banner.jpg) center center no-repeat;
+  background: url(../images/banner2.jpg) center center no-repeat;
   background-size: cover;
   height: 262px;
   width: auto;
@@ -21094,7 +21094,7 @@ dl li {
     display: flex;
     -webkit-align-items: center;
     align-items: center;
-    background: #223e9c;
+    background:#20B2AA;
     padding: 0.5rem 1.4rem;
     left: 70px;
     position: absolute;
@@ -21110,13 +21110,13 @@ dl li {
     display: none;
   }
   .sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link:hover .menu-title {
-    background: #223e9c;
+    background: #20B2AA;
   }
   .sidebar-icon-only .sidebar .nav .nav-item.hover-open .collapse,
   .sidebar-icon-only .sidebar .nav .nav-item.hover-open .collapsing {
     display: block;
     padding: .5rem 0;
-    background: #223e9c;
+    background: #20B2AA;
     border-radius: 0 0 5px 0;
     position: absolute;
     left: 70px;
