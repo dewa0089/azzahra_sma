@@ -81,6 +81,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    
     // Doughnut Chart - Barang
     const ctx = document.getElementById('doughnutChart').getContext('2d');
     new Chart(ctx, {
@@ -189,6 +190,9 @@ new Chart(ctxPie, {
     }
 });
 
+
+
 </script>
+
 
 @endsection

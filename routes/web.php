@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\{
     BarangController,
     RusakController,
@@ -16,17 +17,30 @@ use App\Http\Controllers\{
     LainnyaController,
     PerbaikanController
 };
+use App\Http\Controllers\Auth\LoginController;
 
-Route::get('/', fn() => view('auth.login'));
+// Redirect ke dashboard jika sudah login
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect('/dashboard');
+    }
+    return view('auth.login');
+})->middleware('guest');
 
-Auth::routes();
+// Autentikasi: login dan logout
+Route::get('login', [LoginController::class, 'showLoginForm'])->middleware('guest')->name('login');
+Route::post('login', [LoginController::class, 'login'])->middleware('guest');
+Route::post('logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
+// Halaman utama setelah login
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'checkRole:A,U,K,W'])
     ->name('dashboard');
 
+// Grup route yang memerlukan autentikasi
 Route::middleware(['auth'])->group(function () {
 
+    // Role A, K, W
     Route::middleware('checkRole:A,K,W')->group(function () {
         Route::resource('elektronik', ElektronikController::class);
         Route::resource('mobiler', MobilerController::class);
@@ -42,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/laporan/rusak', [LaporanController::class, 'cetakBarangRusak']);
     });
 
+    // Role A, U
     Route::middleware('checkRole:A,U')->group(function () {
         Route::resource('barang', BarangController::class);
         Route::resource('peminjaman', PeminjamanController::class);
@@ -50,12 +65,13 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/peminjaman/{id}/batalkan', [PeminjamanController::class, 'batalkan'])->name('peminjaman.batalkan');
     });
 
+    // Role A
     Route::middleware('checkRole:A')->group(function () {
         Route::resource('user', UserController::class);
         Route::resource('rusak', RusakController::class);
         Route::resource('pemusnaan', PemusnaanController::class);
         Route::resource('perbaikan', PerbaikanController::class);
-        
+
         Route::patch('/peminjaman/{id}/setujui', [PeminjamanController::class, 'setujui'])->name('peminjaman.setujui');
         Route::patch('/peminjaman/{id}/tolak', [PeminjamanController::class, 'tolak'])->name('peminjaman.tolak');
         Route::put('/pengembalian/setujui/{id}', [PengembalianController::class, 'setujui'])->name('pengembalian.setujui');
@@ -69,8 +85,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/perbaikan/selesaikan/store', [PerbaikanController::class, 'selesaikanPerbaikanStore'])->name('perbaikan.selesaikan.store');
     });
 
+    // Semua Role
     Route::middleware('checkRole:A,U,K,W')->group(function () {
         Route::resource('history', HistorieController::class);
     });
-
 });
