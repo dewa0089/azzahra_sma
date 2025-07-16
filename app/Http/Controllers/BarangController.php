@@ -9,21 +9,28 @@ use App\Helpers\ActivityHelper;
 class BarangController extends Controller
 {
     public function index(Request $request)
-    {
-        $search = $request->input('search');
+{
+    $search = $request->input('search');
 
-        if ($search) {
-            $barang = Barang::where('nama_barang', 'like', "%{$search}%")
-                ->orWhere('kode_barang', 'like', "%{$search}%")
-                ->get();
-        } else {
-            $barang = Barang::all();
-        }
-
-        $totalHarga = $barang->sum('total_harga');
-
-        return view("barang.index", compact('barang', 'totalHarga'));
+    if ($search) {
+        // Hanya cari dari data yang belum dihapus (tanpa withTrashed)
+        $barang = Barang::whereNull('deleted_at')
+            ->where(function ($query) use ($search) {
+                $query->where('nama_barang', 'like', "%{$search}%")
+                      ->orWhere('kode_barang', 'like', "%{$search}%");
+            })
+            ->get();
+    } else {
+        // Hanya ambil data yang belum dihapus
+        $barang = Barang::all();
     }
+
+    // Total harga hanya dari data yang belum dihapus
+    $totalHarga = $barang->sum('total_harga');
+
+    return view("barang.index", compact('barang', 'totalHarga'));
+}
+
 
     public function create()
     {
@@ -99,4 +106,22 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
     }
     }
+
+    public function trash()
+{
+    $barang = Barang::onlyTrashed()->get();
+    return view('barang.trash', compact('barang'));
+}
+
+public function restore($id)
+{
+    $barang = Barang::withTrashed()->findOrFail($id);
+    $barang->restore();
+
+    ActivityHelper::log('Restore Barang', 'Barang ' . $barang->nama_barang . ' berhasil direstore');
+
+    return redirect()->route('barang.index')->with('success', 'Barang berhasil direstore');
+}
+
+
 }

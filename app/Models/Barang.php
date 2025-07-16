@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Barang extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
     protected $table = 'barangs';
     protected $fillable = ['kode_barang', 'nama_barang', 'jumlah_barang', 'jumlah_rusak', 'jumlah_hilang', 'tgl_peroleh', 'harga_perunit', 'total_harga'];
+    protected $dates = ['deleted_at'];
 
 }

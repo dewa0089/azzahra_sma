@@ -58,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Role A, U
     Route::middleware('checkRole:A,U')->group(function () {
-        Route::resource('barang', BarangController::class);
+        Route::resource('barang', BarangController::class)->except(['show']);
         Route::resource('peminjaman', PeminjamanController::class);
         Route::resource('pengembalian', PengembalianController::class)->except(['create']);
         Route::get('/pengembalian/create/{id}', [PengembalianController::class, 'create'])->name('pengembalian.create.id');
@@ -83,6 +83,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/perbaikan/mulai/{rusak_id}', [PerbaikanController::class, 'ubahStatusDalamPerbaikan'])->name('perbaikan.mulai');
         Route::get('/perbaikan/selesaikan/{rusak_id}', [PerbaikanController::class, 'selesaikanPerbaikan'])->name('perbaikan.selesaikan');
         Route::post('/perbaikan/selesaikan/store', [PerbaikanController::class, 'selesaikanPerbaikanStore'])->name('perbaikan.selesaikan.store');
+        Route::get('/barang/trash', [BarangController::class, 'trash'])->name('barang.trash');
+        Route::put('/barang/restore/{id}', [BarangController::class, 'restore'])->name('barang.restore');
     });
 
     // Semua Role
