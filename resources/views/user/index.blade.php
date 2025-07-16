@@ -11,6 +11,9 @@
             <h4 class="card-title">Manajemen User</h4>
           </div>
           <div class="col text-end d-flex align-items-end justify-content-end">
+            <a href="{{ route('user.trash') }}" class="btn btn-warning mdi mdi-archive btn-icon-prepend mr-2">
+                Data Terhapus
+             </a> 
             <a href="{{ route('user.create') }}" class="btn btn-success mdi mdi-upload btn-icon-prepend">
               Tambah User
             </a>

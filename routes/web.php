@@ -18,6 +18,7 @@ use App\Http\Controllers\{
     PerbaikanController
 };
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\NotificationController;
 
 // Redirect ke dashboard jika sudah login
 Route::get('/', function () {
@@ -42,9 +43,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Role A, K, W
     Route::middleware('checkRole:A,K,W')->group(function () {
-        Route::resource('elektronik', ElektronikController::class);
-        Route::resource('mobiler', MobilerController::class);
-        Route::resource('lainnya', LainnyaController::class);
+        Route::resource('elektronik', ElektronikController::class)->except(['show']);
+        Route::resource('lainnya', LainnyaController::class)->except(['show']);
+        Route::resource('mobiler', MobilerController::class)->except(['show']);
         Route::resource('laporan', LaporanController::class)->except(['show']);
         Route::get('/laporan/elektronik', [LaporanController::class, 'cetakElektronik']);
         Route::get('/laporan/mobiler', [LaporanController::class, 'cetakMobiler']);
@@ -67,8 +68,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Role A
     Route::middleware('checkRole:A')->group(function () {
-        Route::resource('user', UserController::class);
-        Route::resource('rusak', RusakController::class);
+        Route::resource('user', UserController::class)->except(['show']);
+        Route::resource('rusak', RusakController::class)->except(['show']);
         Route::resource('pemusnaan', PemusnaanController::class);
         Route::resource('perbaikan', PerbaikanController::class);
 
@@ -85,6 +86,27 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/perbaikan/selesaikan/store', [PerbaikanController::class, 'selesaikanPerbaikanStore'])->name('perbaikan.selesaikan.store');
         Route::get('/barang/trash', [BarangController::class, 'trash'])->name('barang.trash');
         Route::put('/barang/restore/{id}', [BarangController::class, 'restore'])->name('barang.restore');
+
+        Route::get('/elektronik/trash', [ElektronikController::class, 'trash'])->name('elektronik.trash');
+        Route::put('/elektronik/restore/{id}', [ElektronikController::class, 'restore'])->name('elektronik.restore');
+
+        Route::get('/lainnya/trash', [LainnyaController::class, 'trash'])->name('lainnya.trash');
+        Route::put('/lainnya/restore/{id}', [LainnyaController::class, 'restore'])->name('lainnya.restore');
+
+        Route::get('/mobiler/trash', [MobilerController::class, 'trash'])->name('mobiler.trash');
+        Route::put('/mobiler/restore/{id}', [MobilerController::class, 'restore'])->name('mobiler.restore');
+
+        Route::get('/rusak/trash', [RusakController::class, 'trash'])->name('rusak.trash');
+        Route::put('/rusak/restore/{id}', [RusakController::class, 'restore'])->name('rusak.restore');
+
+        Route::get('/user/trash', [UserController::class, 'trash'])->name('user.trash');
+        Route::put('/user/restore/{id}', [UserController::class, 'restore'])->name('user.restore');
+
+        Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
+
+        Route::post('/save-token', [NotificationController::class, 'saveToken'])->name('save.token');
+
+
     });
 
     // Semua Role

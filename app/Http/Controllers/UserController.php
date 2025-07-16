@@ -93,4 +93,20 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('user.index')->with('success', 'Data User berhasil dihapus');
     }
+
+    public function trash()
+{
+    $user = User::onlyTrashed()->get();
+    return view('user.trash', compact('user'));
+}
+
+public function restore($id)
+{
+    $user = User::withTrashed()->findOrFail($id);
+    $user->restore();
+
+    ActivityHelper::log('Restore Data User', 'Merestore user dengan nama: ' . $user->name);
+    return redirect()->route('user.index')->with('success', 'Data User berhasil direstore');
+}
+
 }

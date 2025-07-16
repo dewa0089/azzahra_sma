@@ -13,13 +13,16 @@ class ElektronikController extends Controller
         $search = $request->input('search');
 
         if ($search) {
-            $elektronik = Elektronik::where('nama_barang', 'like', "%{$search}%")
-                ->orWhere('kode_barang', 'like', "%{$search}%")
-                ->orWhere('merk', 'like', "%{$search}%")
-                ->orWhere('type', 'like', "%{$search}%")
+            $elektronik = Elektronik::whereNull('deleted_at')
+                ->where(function ($query) use ($search) {
+                    $query->where('nama_barang', 'like', "%{$search}%")
+                          ->orWhere('kode_barang', 'like', "%{$search}%")
+                          ->orWhere('merk', 'like', "%{$search}%")
+                          ->orWhere('type', 'like', "%{$search}%");
+                })
                 ->get();
         } else {
-            $elektronik = Elektronik::orderBy('created_at', 'desc')->get();
+            $elektronik = Elektronik::all(); // hanya yang belum terhapus
         }
 
         $totalHarga = $elektronik->sum('total_harga');
@@ -83,21 +86,36 @@ class ElektronikController extends Controller
         return redirect()->route('elektronik.index')->with('success', 'Data Barang Elektronik berhasil diupdate');
     }
 
-   public function destroy($id)
+    public function destroy($id)
     {
-    try {
-        $elektronik = Elektronik::findOrFail($id);
-        $nama = $elektronik->nama_barang;
-        $elektronik->delete();
+        try {
+            $elektronik = Elektronik::findOrFail($id);
+            $nama = $elektronik->nama_barang;
+            $elektronik->delete(); // Soft delete
 
-        // Simpan riwayat
-        ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Elektronik dengan nama ' . $nama . ' berhasil dihapus');
+            ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Elektronik dengan nama ' . $nama . ' berhasil dihapus');
 
-        return redirect()->route('elektronik.index')->with('success', 'Data Barang berhasil dihapus');
-    } catch (\Illuminate\Database\QueryException $e) {
-        return redirect()->route('elektronik.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
-    } catch (\Exception $e) {
-        return redirect()->route('elektronik.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+            return redirect()->route('elektronik.index')->with('success', 'Data Barang berhasil dihapus');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('elektronik.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
+        } catch (\Exception $e) {
+            return redirect()->route('elektronik.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+        }
     }
+
+    public function trash()
+    {
+        $elektronik = Elektronik::onlyTrashed()->get();
+        return view('inventaris.elektronik.trash', compact('elektronik'));
+    }
+
+    public function restore($id)
+    {
+        $elektronik = Elektronik::withTrashed()->findOrFail($id);
+        $elektronik->restore();
+
+        ActivityHelper::log('Restore Barang', 'Barang Elektronik ' . $elektronik->nama_barang . ' berhasil direstore');
+
+        return redirect()->route('elektronik.index')->with('success', 'Barang berhasil direstore');
     }
 }

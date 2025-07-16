@@ -174,5 +174,42 @@ public function index()
     }
 }
 
+public function trash()
+{
+    $rusak = Rusak::onlyTrashed()
+        ->orderBy('deleted_at', 'desc')
+        ->get();
+
+    return view('rusak.trash', compact('rusak'));
+}
+
+public function restore($id)
+{
+    $rusak = Rusak::withTrashed()->findOrFail($id);
+
+    // Kembalikan stok di inventaris dikurangi kembali saat restore
+    $jumlahRusak = $rusak->jumlah_brg_rusak;
+    $barang = null;
+
+    if ($rusak->jenis_brg_rusak === 'elektronik' && $rusak->elektronik_id) {
+        $barang = Elektronik::find($rusak->elektronik_id);
+    } elseif ($rusak->jenis_brg_rusak === 'mobiler' && $rusak->mobiler_id) {
+        $barang = Mobiler::find($rusak->mobiler_id);
+    } elseif ($rusak->jenis_brg_rusak === 'lainnya' && $rusak->lainnya_id) {
+        $barang = Lainnya::find($rusak->lainnya_id);
+    }
+
+    if ($barang && $barang->jumlah_brg >= $jumlahRusak) {
+        $barang->jumlah_brg -= $jumlahRusak;
+        $barang->save();
+    }
+
+    $rusak->restore();
+
+    ActivityHelper::log('Restore Barang Rusak', 'Data barang rusak dengan ID ' . $id . ' berhasil direstore.');
+
+    return redirect()->route('rusak.index')->with('success', 'Data barang rusak berhasil direstore.');
+}
+
 
 }

@@ -13,8 +13,8 @@
           @if(in_array(Auth::user()->role, ['A']))
           <div class="col text-end d-flex align-items-end justify-content-end">
              <a href="{{ route('barang.trash') }}" class="btn btn-warning mdi mdi-archive btn-icon-prepend mr-2">
-        Data Terhapus
-    </a>
+                Data Terhapus
+             </a> 
             <a href="{{ route('barang.create')}}" class="btn btn-success mdi mdi-upload btn-icon-prepend">
               Tambah Data
             </a>

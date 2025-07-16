@@ -35,13 +35,21 @@
                             <input type="date" class="form-control" name="tgl_peroleh" placeholder="Tanggal Peroleh Barang"
                                 value="{{ $lainnya->tgl_peroleh }}">
 
-                            <label for="asal_usul">Asal Usul Barang</label>
-                            <input type="text" class="form-control" name="asal_usul" placeholder="Asal Usul Barang"
-                                value="{{ $lainnya->asal_usul }}">
+                            <select class="form-control" name="asal_usul">
+                                <option value="">-- Pilih Asal Usul --</option>
+                                <option value="Pembelian" {{ $elektronik->asal_usul == 'Pembelian' ? 'selected' : '' }}>Pembelian</option>
+                                <option value="Hibah" {{ $elektronik->asal_usul == 'Hibah' ? 'selected' : '' }}>Hibah</option>
+                                <option value="Sumbangan" {{ $elektronik->asal_usul == 'Sumbangan' ? 'selected' : '' }}>Sumbangan</option>
+                                <option value="Bantuan Pemerintah" {{ $elektronik->asal_usul == 'Bantuan Pemerintah' ? 'selected' : '' }}>Bantuan Pemerintah</option>
+                            </select>
 
-                            <label for="cara_peroleh">Cara Peroleh Barang</label>
-                            <input type="text" class="form-control" name="cara_peroleh" placeholder="Cara Peroleh Barang"
-                                value="{{ $lainnya->cara_peroleh }}">
+                            <select class="form-control" name="cara_peroleh">
+                                <option value="">-- Pilih Cara Peroleh --</option>
+                                <option value="Toko Langsung" {{ $elektronik->cara_peroleh == 'Toko Langsung' ? 'selected' : '' }}>Toko Langsung</option>
+                                <option value="Lelang" {{ $elektronik->cara_peroleh == 'Lelang' ? 'selected' : '' }}>Lelang</option>
+                                <option value="Donatur" {{ $elektronik->cara_peroleh == 'Donatur' ? 'selected' : '' }}>Donatur</option>
+                                <option value="Dinas Pendidikan" {{ $elektronik->cara_peroleh == 'Dinas Pendidikan' ? 'selected' : '' }}>Dinas Pendidikan</option>
+                            </select>
                             
                             <label for="jumlah_brg">Jumlah Barang</label>
                             <input type="number" class="form-control" id="jumlah_brg" name="jumlah_brg" placeholder="Jumlah Barang"

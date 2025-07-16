@@ -48,13 +48,25 @@
                             @enderror
 
                             <label for="asal_usul">Asal Usul Barang</label>
-                            <input type="text" class="form-control" name="asal_usul" placeholder="Asal Usul Barang" value="{{ old('asal_usul') }}">
+                            <select class="form-control" name="asal_usul">
+                                <option value="">-- Pilih Asal Usul --</option>
+                                <option value="Pembelian" {{ old('asal_usul') == 'Pembelian' ? 'selected' : '' }}>Pembelian</option>
+                                <option value="Hibah" {{ old('asal_usul') == 'Hibah' ? 'selected' : '' }}>Hibah</option>
+                                <option value="Sumbangan" {{ old('asal_usul') == 'Sumbangan' ? 'selected' : '' }}>Sumbangan</option>
+                                <option value="Bantuan Pemerintah" {{ old('asal_usul') == 'Bantuan Pemerintah' ? 'selected' : '' }}>Bantuan Pemerintah</option>
+                            </select>
                             @error('asal_usul')
                                 <label class="text-danger">{{ $message }}</label>
                             @enderror
 
                             <label for="cara_peroleh">Cara Peroleh Barang</label>
-                            <input type="text" class="form-control" name="cara_peroleh" placeholder="Cara Peroleh Barang" value="{{ old('cara_peroleh') }}">
+                            <select class="form-control" name="cara_peroleh">
+                                <option value="">-- Pilih Cara Peroleh --</option>
+                                <option value="Toko Langsung" {{ old('cara_peroleh') == 'Toko Langsung' ? 'selected' : '' }}>Toko Langsung</option>
+                                <option value="Lelang" {{ old('cara_peroleh') == 'Lelang' ? 'selected' : '' }}>Lelang</option>
+                                <option value="Donatur" {{ old('cara_peroleh') == 'Donatur' ? 'selected' : '' }}>Donatur</option>
+                                <option value="Dinas Pendidikan" {{ old('cara_peroleh') == 'Dinas Pendidikan' ? 'selected' : '' }}>Dinas Pendidikan</option>
+                            </select>
                             @error('cara_peroleh')
                                 <label class="text-danger">{{ $message }}</label>
                             @enderror

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('harga_perunit');
             $table->integer('total_harga')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
     

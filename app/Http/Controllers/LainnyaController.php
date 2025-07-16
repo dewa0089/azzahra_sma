@@ -13,13 +13,16 @@ class LainnyaController extends Controller
         $search = $request->input('search');
 
         if ($search) {
-            $lainnya = Lainnya::where('nama_barang', 'like', "%{$search}%")
-                ->orWhere('kode_barang', 'like', "%{$search}%")
-                ->orWhere('merk', 'like', "%{$search}%")
-                ->orWhere('type', 'like', "%{$search}%")
+            $lainnya = Lainnya::whereNull('deleted_at')
+                ->where(function ($query) use ($search) {
+                    $query->where('nama_barang', 'like', "%{$search}%")
+                          ->orWhere('kode_barang', 'like', "%{$search}%")
+                          ->orWhere('merk', 'like', "%{$search}%")
+                          ->orWhere('type', 'like', "%{$search}%");
+                })
                 ->get();
         } else {
-            $lainnya = Lainnya::orderBy('created_at', 'desc')->get();
+            $lainnya = Lainnya::all(); // hanya data yang belum dihapus
         }
 
         $totalHarga = $lainnya->sum('total_harga');
@@ -49,7 +52,6 @@ class LainnyaController extends Controller
 
         $lainnya = Lainnya::create($validated);
 
-        // Simpan riwayat aktivitas
         ActivityHelper::log('Tambah Barang', 'Inventaris Barang Besar Lainnya dengan nama ' . $lainnya->nama_barang . ' berhasil ditambahkan');
 
         return redirect()->route('lainnya.index')->with('success', 'Data Barang Lainnya berhasil disimpan');
@@ -85,27 +87,41 @@ class LainnyaController extends Controller
         $lainnya = Lainnya::find($id);
         $lainnya->update($validated);
 
-        // Simpan riwayat aktivitas
         ActivityHelper::log('Edit Barang', 'Inventaris Barang Besar Lainnya dengan nama ' . $lainnya->nama_barang . ' berhasil diupdate');
 
         return redirect()->route('lainnya.index')->with('success', 'Data Barang Lainnya berhasil diupdate');
     }
 
-     public function destroy($id)
+    public function destroy($id)
     {
-    try {
-        $lainnya = Lainnya::findOrFail($id);
-        $nama = $lainnya->nama_barang;
-        $lainnya->delete();
+        try {
+            $lainnya = Lainnya::findOrFail($id);
+            $nama = $lainnya->nama_barang;
+            $lainnya->delete(); // soft delete
 
-        // Simpan riwayat
-        ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Lainnya dengan nama ' . $nama . ' berhasil dihapus');
+            ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Lainnya dengan nama ' . $nama . ' berhasil dihapus');
 
-        return redirect()->route('lainnya.index')->with('success', 'Data Barang berhasil dihapus');
-    } catch (\Illuminate\Database\QueryException $e) {
-        return redirect()->route('lainnya.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
-    } catch (\Exception $e) {
-        return redirect()->route('lainnya.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+            return redirect()->route('lainnya.index')->with('success', 'Data Barang berhasil dihapus');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('lainnya.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
+        } catch (\Exception $e) {
+            return redirect()->route('lainnya.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+        }
     }
+
+    public function trash()
+    {
+        $lainnya = Lainnya::onlyTrashed()->get();
+        return view('inventaris.lainnya.trash', compact('lainnya'));
+    }
+
+    public function restore($id)
+    {
+        $lainnya = Lainnya::withTrashed()->findOrFail($id);
+        $lainnya->restore();
+
+        ActivityHelper::log('Restore Barang', 'Barang Lainnya ' . $lainnya->nama_barang . ' berhasil direstore');
+
+        return redirect()->route('lainnya.index')->with('success', 'Barang berhasil direstore');
     }
 }

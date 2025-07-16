@@ -11,6 +11,8 @@ use App\Models\Pengembalian;
 use App\Models\Barang;
 use App\Helpers\ActivityHelper;
 use App\Models\User;
+use Google\Auth\Credentials\ServiceAccountCredentials;
+use Illuminate\Support\Facades\Storage;
 
 class PeminjamanController extends Controller
 {
@@ -83,6 +85,8 @@ class PeminjamanController extends Controller
     ]);
 
     ActivityHelper::log('Ajukan Peminjaman', 'Peminjaman oleh ' . $peminjaman->nama_peminjam . ' untuk Inventaris Barang Kecil dengan nama ' . $peminjaman->barang->nama_barang . ' telah diajukan.');
+
+    $this->sendPushNotificationToAdmins('Pengajuan Peminjaman Baru', 'oleh ' . $peminjaman->nama_peminjam);
 
     return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diajukan!');
 }
@@ -183,4 +187,48 @@ class PeminjamanController extends Controller
 
         return redirect()->back()->with('success', 'Peminjaman dibatalkan.');
     }
+
+    public function sendPushNotificationToAdmins($title, $body)
+{
+    // Lokasi file service account JSON kamu
+    $keyFile = storage_path('app/firebase-service-account.json'); // pastikan path benar
+
+    $credentials = new ServiceAccountCredentials(
+        'https://www.googleapis.com/auth/firebase.messaging',
+        $keyFile
+    );
+
+    $token = $credentials->fetchAuthToken();
+    $accessToken = $token['access_token'];
+
+    $projectId = 'inventarissekolah-c84fc'; // Ganti dengan Project ID kamu
+    $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+    $tokens = User::whereIn('role', ['A', 'K', 'W'])
+        ->whereNotNull('fcm_token')
+        ->pluck('fcm_token')
+        ->toArray();
+
+    foreach ($tokens as $deviceToken) {
+        $data = [
+            "message" => [
+                "token" => $deviceToken,
+                "notification" => [
+                    "title" => $title,
+                    "body" => $body,
+                ],
+            ]
+        ];
+
+        $client = new \GuzzleHttp\Client();
+        $response = $client->post($url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $data,
+        ]);
+    }
+}
+
 }

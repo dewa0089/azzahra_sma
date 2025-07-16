@@ -11,6 +11,9 @@
             <h4 class="card-title">Inventaris Barang Rusak</h4>
           </div>
           <div class="col text-end d-flex align-items-end justify-content-end">
+            <a href="{{ route('rusak.trash') }}" class="btn btn-warning mdi mdi-archive btn-icon-prepend mr-2">
+                Data Terhapus
+             </a> 
             <a href="{{ route('rusak.create') }}" class="btn btn-success mdi mdi-upload btn-icon-prepend">
               Tambah Barang Rusak
             </a>

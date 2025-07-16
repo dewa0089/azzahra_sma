@@ -11,6 +11,9 @@
             <h4 class="card-title">Aset Barang Mobiler Sekolah</h4>
           </div>
           <div class="col text-end d-flex align-items-end justify-content-end">
+            <a href="{{ route('mobiler.trash') }}" class="btn btn-warning mdi mdi-archive btn-icon-prepend mr-2">
+                Data Terhapus
+             </a> 
             <a href="{{ route('mobiler.create')}}" class="btn btn-success mdi mdi-upload btn-icon-prepend">
               Tambah Data
             </a>

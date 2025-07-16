@@ -237,6 +237,70 @@
                 });
         });
     </script>
+
+    
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyB_gRGTKhf0kXwyGu-U3fhcSmR026oABeQ",
+        authDomain: "inventarissekolah-c84fc.firebaseapp.com",
+        projectId: "inventarissekolah-c84fc",
+        storageBucket: "inventarissekolah-c84fc.appspot.com",
+        messagingSenderId: "791710839955",
+        appId: "1:791710839955:web:ce816debc8f7b9ec224966"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+            .then(function (registration) {
+                console.log("Service Worker terdaftar:", registration);
+
+                return Notification.requestPermission();
+            })
+            .then(function (permission) {
+                if (permission === 'granted') {
+                    return messaging.getToken({
+                        vapidKey: 'BOVUUvpxyL5_v0h0N3EsRZDixWHBafNiFzRJpbaD9woibmU-7ACSEoGsJo3nVG25IHtYnc_v6zvdBkfsZ5ZYyKk'
+                    });
+                } else {
+                    console.warn("Izin notifikasi ditolak");
+                }
+            })
+            .then(function (token) {
+                if (token) {
+                    console.log("FCM Token:", token);
+                    fetch('/save-token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ token: token })
+                    });
+                }
+            })
+            .catch(function (err) {
+                console.error("Gagal meminta izin notifikasi:", err);
+            });
+
+        messaging.onMessage(function (payload) {
+            console.log('Notifikasi diterima:', payload);
+            alert(payload.notification.title + "\n" + payload.notification.body);
+        });
+
+    } else {
+        console.warn("Browser tidak mendukung service worker");
+    }
+</script>
+
+
+
 </body>
 
 </html>

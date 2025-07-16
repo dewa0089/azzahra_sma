@@ -6,8 +6,16 @@
   <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">Barang yang Dihapus (Trash)</h4>
-        <a href="{{ route('barang.index') }}" class="btn btn-primary btn-sm mb-3">Kembali ke Data Barang</a>
+        <div class="row mb-1">
+          <div class="col">
+            <h4 class="card-title ml-1">Data Barang Pendukung yang Dihapus (Trash)</h4>
+          </div>
+          <div class="col text-end d-flex align-items-end justify-content-end">
+            <a href="{{ route('barang.index') }}" class="btn btn-primary mdi mdi-arrow-left-bold btn-icon-prepend">
+              Kembali ke Data Barang Pendukung
+            </a>
+          </div>
+        </div>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead>

@@ -31,6 +31,7 @@ return new class extends Migration
             $table->foreign('mobiler_id')->references('id')->on('mobilers')->restrictOnDelete()->restrictOnUpdate();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

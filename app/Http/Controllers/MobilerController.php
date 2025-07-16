@@ -13,16 +13,18 @@ class MobilerController extends Controller
         $search = $request->input('search');
 
         if ($search) {
-            $mobiler = Mobiler::where('nama_barang', 'like', "%{$search}%")
-                ->orWhere('kode_barang', 'like', "%{$search}%")
-                ->orWhere('merk', 'like', "%{$search}%")
-                ->orWhere('type', 'like', "%{$search}%")
+            $mobiler = Mobiler::whereNull('deleted_at')
+                ->where(function ($query) use ($search) {
+                    $query->where('nama_barang', 'like', "%{$search}%")
+                          ->orWhere('kode_barang', 'like', "%{$search}%")
+                          ->orWhere('merk', 'like', "%{$search}%")
+                          ->orWhere('type', 'like', "%{$search}%");
+                })
                 ->get();
         } else {
-            $mobiler = Mobiler::orderBy('created_at', 'desc')->get();
+            $mobiler = Mobiler::all(); // hanya yang belum terhapus
         }
 
-        // Hitung total harga dari data yang ditampilkan
         $totalHarga = $mobiler->sum('total_harga');
 
         return view("inventaris.mobiler.index", compact('mobiler', 'totalHarga'));
@@ -50,7 +52,6 @@ class MobilerController extends Controller
 
         $mobiler = Mobiler::create($validated);
 
-        // Simpan riwayat
         ActivityHelper::log('Tambah Barang', 'Inventaris Barang Besar Mobiler dengan nama ' . $mobiler->nama_barang . ' berhasil ditambahkan');
 
         return redirect()->route('mobiler.index')->with('success', 'Data Barang Mobiler berhasil disimpan');
@@ -80,28 +81,41 @@ class MobilerController extends Controller
         $mobiler = Mobiler::find($id);
         $mobiler->update($validated);
 
-        // Simpan riwayat
         ActivityHelper::log('Edit Barang', 'Inventaris Barang Besar Mobiler dengan nama ' . $mobiler->nama_barang . ' berhasil diupdate');
 
         return redirect()->route('mobiler.index')->with('success', 'Data Barang Mobiler berhasil diupdate');
     }
 
-   public function destroy($id)
-{
-    try {
-        $mobiler = Mobiler::findOrFail($id);
-        $nama = $mobiler->nama_barang;
-        $mobiler->delete();
+    public function destroy($id)
+    {
+        try {
+            $mobiler = Mobiler::findOrFail($id);
+            $nama = $mobiler->nama_barang;
+            $mobiler->delete(); // soft delete
 
-        // Simpan riwayat
-        ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Mobiler dengan nama ' . $nama . ' berhasil dihapus');
+            ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Mobiler dengan nama ' . $nama . ' berhasil dihapus');
 
-        return redirect()->route('mobiler.index')->with('success', 'Data Barang berhasil dihapus');
-    } catch (\Illuminate\Database\QueryException $e) {
-        return redirect()->route('mobiler.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
-    } catch (\Exception $e) {
-        return redirect()->route('mobiler.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+            return redirect()->route('mobiler.index')->with('success', 'Data Barang berhasil dihapus');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('mobiler.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
+        } catch (\Exception $e) {
+            return redirect()->route('mobiler.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+        }
     }
-}
 
+    public function trash()
+    {
+        $mobiler = Mobiler::onlyTrashed()->get();
+        return view('inventaris.mobiler.trash', compact('mobiler'));
+    }
+
+    public function restore($id)
+    {
+        $mobiler = Mobiler::withTrashed()->findOrFail($id);
+        $mobiler->restore();
+
+        ActivityHelper::log('Restore Barang', 'Barang Mobiler ' . $mobiler->nama_barang . ' berhasil direstore');
+
+        return redirect()->route('mobiler.index')->with('success', 'Barang berhasil direstore');
+    }
 }
