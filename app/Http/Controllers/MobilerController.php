@@ -86,22 +86,30 @@ class MobilerController extends Controller
         return redirect()->route('mobiler.index')->with('success', 'Data Barang Mobiler berhasil diupdate');
     }
 
-    public function destroy($id)
-    {
-        try {
-            $mobiler = Mobiler::findOrFail($id);
-            $nama = $mobiler->nama_barang;
-            $mobiler->delete(); // soft delete
+   public function destroy($id)
+{
+    try {
+        $mobiler = Mobiler::findOrFail($id);
 
-            ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Mobiler dengan nama ' . $nama . ' berhasil dihapus');
-
-            return redirect()->route('mobiler.index')->with('success', 'Data Barang berhasil dihapus');
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->route('mobiler.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
-        } catch (\Exception $e) {
-            return redirect()->route('mobiler.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+        // Cek apakah digunakan di tabel rusak
+        if ($mobiler->rusak()->exists()) {
+            return redirect()->route('mobiler.index')
+                ->with('error', 'Data tidak dapat dihapus karena digunakan di data barang rusak.');
         }
+
+        $nama = $mobiler->nama_barang;
+        $mobiler->delete(); // soft delete
+
+        ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Mobiler dengan nama ' . $nama . ' berhasil dihapus');
+
+        return redirect()->route('mobiler.index')->with('success', 'Data Barang berhasil dihapus');
+    } catch (\Illuminate\Database\QueryException $e) {
+        return redirect()->route('mobiler.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
+    } catch (\Exception $e) {
+        return redirect()->route('mobiler.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
     }
+}
+
 
     public function trash()
     {
@@ -118,4 +126,15 @@ class MobilerController extends Controller
 
         return redirect()->route('mobiler.index')->with('success', 'Barang berhasil direstore');
     }
+
+     public function forceDelete($id)
+{
+    $mobiler = Mobiler::withTrashed()->findOrFail($id);
+    $nama = $mobiler->nama_barang;
+    $mobiler->forceDelete();
+
+    ActivityHelper::log('Hapus Permanen Barang', 'Barang Mobiler ' . $nama . ' dihapus permanen');
+
+    return redirect()->route('mobiler.trash')->with('success', 'Barang dihapus secara permanen.');
+}
 }

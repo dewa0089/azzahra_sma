@@ -28,5 +28,16 @@ class Rusak extends Model
         return $this->belongsTo(Mobiler::class, 'mobiler_id');
     }
 
+    public function pemusnahan()
+{
+    return $this->hasOne(Pemusnaan::class, 'rusak_id');
+}
+
+public function perbaikan()
+{
+    return $this->hasOne(Perbaikan::class, 'rusak_id');
+}
+
+
 
 }

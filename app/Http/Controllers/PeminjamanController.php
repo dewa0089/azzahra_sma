@@ -149,6 +149,15 @@ class PeminjamanController extends Controller
         $peminjaman->status = 'Disetujui';
         $peminjaman->save();
 
+        $user = User::find($peminjaman->user_id);
+if ($user && $user->fcm_token) {
+    $this->sendPushNotificationToUser(
+        $user->fcm_token,
+        'Peminjaman Anda Disetujui Admin',
+        'Peminjaman Anda atas barang ' . $barang->nama_barang . ' telah disetujui.'
+    );
+}
+
         if (!$peminjaman->pengembalian) {
             Pengembalian::create([
                 'id' => Str::uuid(),
@@ -167,26 +176,45 @@ class PeminjamanController extends Controller
     }
 
     public function tolak($id)
-    {
-        $peminjaman = Peminjaman::findOrFail($id);
-        $peminjaman->status = 'Ditolak';
-        $peminjaman->save();
+{
+    $peminjaman = Peminjaman::findOrFail($id);
+    $peminjaman->status = 'Ditolak';
+    $peminjaman->save();
 
-        ActivityHelper::log('Tolak Peminjaman', 'Peminjaman untuk Inventaris Barang Kecil dengan nama ' . $peminjaman->barang->nama_barang . ' ditolak.');
-
-        return redirect()->back()->with('success', 'Peminjaman ditolak.');
+    // Kirim notifikasi ke user
+    $user = User::find($peminjaman->user_id);
+    if ($user && $user->fcm_token) {
+        $this->sendPushNotificationToUser(
+            $user->fcm_token,
+            'Peminjaman Anda Ditolak',
+            'Peminjaman Anda atas barang ' . $peminjaman->barang->nama_barang . ' ditolak oleh admin.'
+        );
     }
 
-    public function batalkan($id)
-    {
-        $peminjaman = Peminjaman::findOrFail($id);
-        $peminjaman->status = 'Dibatalkan';
-        $peminjaman->save();
+    ActivityHelper::log('Tolak Peminjaman', 'Peminjaman untuk Inventaris Barang Kecil dengan nama ' . $peminjaman->barang->nama_barang . ' ditolak.');
 
-        ActivityHelper::log('Batalkan Peminjaman', 'Peminjaman untuk Inventaris Barang Kecil dengan nama ' . $peminjaman->barang->nama_barang . ' dibatalkan.');
+    return redirect()->back()->with('success', 'Peminjaman ditolak.');
+}
 
-        return redirect()->back()->with('success', 'Peminjaman dibatalkan.');
-    }
+   public function batalkan($id)
+{
+    $peminjaman = Peminjaman::findOrFail($id);
+    $peminjaman->status = 'Dibatalkan';
+    $peminjaman->save();
+
+    $barang = $peminjaman->barang;
+
+    // Kirim notifikasi ke admin
+    $this->sendPushNotificationToAdmins(
+        'Peminjaman Dibatalkan',
+        'oleh ' . $peminjaman->nama_peminjam . ' atas barang ' . $barang->nama_barang
+    );
+
+    ActivityHelper::log('Batalkan Peminjaman', 'Peminjaman untuk Inventaris Barang Kecil dengan nama ' . $barang->nama_barang . ' dibatalkan.');
+
+    return redirect()->back()->with('success', 'Peminjaman dibatalkan.');
+}
+
 
     public function sendPushNotificationToAdmins($title, $body)
 {
@@ -230,5 +258,42 @@ class PeminjamanController extends Controller
         ]);
     }
 }
+
+
+public function sendPushNotificationToUser($token, $title, $body)
+{
+    $keyFile = storage_path('app/firebase-service-account.json');
+
+    $credentials = new \Google\Auth\Credentials\ServiceAccountCredentials(
+        'https://www.googleapis.com/auth/firebase.messaging',
+        $keyFile
+    );
+
+    $authToken = $credentials->fetchAuthToken();
+    $accessToken = $authToken['access_token'];
+
+    $projectId = 'inventarissekolah-c84fc';
+    $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+    $message = [
+        "message" => [
+            "token" => $token,
+            "notification" => [
+                "title" => $title,
+                "body" => $body,
+            ],
+        ]
+    ];
+
+    $client = new \GuzzleHttp\Client();
+    $client->post($url, [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ],
+        'json' => $message,
+    ]);
+}
+
 
 }

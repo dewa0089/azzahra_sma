@@ -47,13 +47,24 @@
                   @endswitch
                 </td>
                 <td>{{ $item->deleted_at }}</td>
-                <td>
-                  <form action="{{ route('user.restore', $item->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <button type="submit" class="btn btn-success btn-sm">Restore</button>
-                  </form>
-                </td>
+                <td class="d-flex gap-2">
+                <form action="{{ route('user.restore', $item->id) }}" method="POST">
+                  @csrf
+                  @method('PUT')
+                  <button type="submit" class="btn btn-success btn-sm mr-2">Restore</button>
+                </form>
+                <form action="{{ route('user.forceDelete', $item->id) }}" method="POST">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit"
+                          class="btn btn-danger btn-sm show_confirm"
+                          data-toggle="tooltip"
+                          title="Hapus Permanen"
+                          data-nama="{{ $item->nama_barang }}">
+                      Hapus Permanen
+                  </button>
+              </form>
+              </td>
               </tr>
               @empty
               <tr>
@@ -79,4 +90,7 @@
     toastr.error("{{ Session::get('error') }}");
   @endif
 </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

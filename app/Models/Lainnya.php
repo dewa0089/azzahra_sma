@@ -13,4 +13,10 @@ class Lainnya extends Model
     protected $table = 'lainnyas';
     protected $fillable = ['kode_barang' ,'nama_barang', 'merk', 'type', 'tgl_peroleh', 'asal_usul', 'cara_peroleh', 'jumlah_brg', 'harga_perunit', 'total_harga'];
     protected $dates = ['deleted_at'];
+
+    public function rusak()
+{
+    return $this->hasMany(Rusak::class, 'lainnya_id');
+}
+
 }

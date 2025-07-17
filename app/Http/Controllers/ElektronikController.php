@@ -87,21 +87,29 @@ class ElektronikController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
-            $elektronik = Elektronik::findOrFail($id);
-            $nama = $elektronik->nama_barang;
-            $elektronik->delete(); // Soft delete
+{
+    try {
+        $elektronik = Elektronik::findOrFail($id);
 
-            ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Elektronik dengan nama ' . $nama . ' berhasil dihapus');
-
-            return redirect()->route('elektronik.index')->with('success', 'Data Barang berhasil dihapus');
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->route('elektronik.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
-        } catch (\Exception $e) {
-            return redirect()->route('elektronik.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+        // Cek apakah data digunakan di tabel rusak
+        if ($elektronik->rusak()->exists()) {
+            return redirect()->route('elektronik.index')
+                ->with('error', 'Data tidak dapat dihapus karena digunakan di data barang rusak.');
         }
+
+        $nama = $elektronik->nama_barang;
+        $elektronik->delete(); // Soft delete
+
+        ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Elektronik dengan nama ' . $nama . ' berhasil dihapus');
+
+        return redirect()->route('elektronik.index')->with('success', 'Data Barang berhasil dihapus');
+    } catch (\Illuminate\Database\QueryException $e) {
+        return redirect()->route('elektronik.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
+    } catch (\Exception $e) {
+        return redirect()->route('elektronik.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
     }
+}
+
 
     public function trash()
     {
@@ -118,4 +126,16 @@ class ElektronikController extends Controller
 
         return redirect()->route('elektronik.index')->with('success', 'Barang berhasil direstore');
     }
+
+    public function forceDelete($id)
+{
+    $elektronik = Elektronik::withTrashed()->findOrFail($id);
+    $nama = $elektronik->nama_barang;
+    $elektronik->forceDelete();
+
+    ActivityHelper::log('Hapus Permanen Barang', 'Barang Elektronik ' . $nama . ' dihapus permanen');
+
+    return redirect()->route('elektronik.trash')->with('success', 'Barang dihapus secara permanen.');
+}
+
 }

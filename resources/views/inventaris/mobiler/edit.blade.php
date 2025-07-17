@@ -37,18 +37,18 @@
 
                             <select class="form-control" name="asal_usul">
                                 <option value="">-- Pilih Asal Usul --</option>
-                                <option value="Pembelian" {{ $elektronik->asal_usul == 'Pembelian' ? 'selected' : '' }}>Pembelian</option>
-                                <option value="Hibah" {{ $elektronik->asal_usul == 'Hibah' ? 'selected' : '' }}>Hibah</option>
-                                <option value="Sumbangan" {{ $elektronik->asal_usul == 'Sumbangan' ? 'selected' : '' }}>Sumbangan</option>
-                                <option value="Bantuan Pemerintah" {{ $elektronik->asal_usul == 'Bantuan Pemerintah' ? 'selected' : '' }}>Bantuan Pemerintah</option>
+                                <option value="Yayasan" {{ $elektronik->asal_usul == 'Yayasan' ? 'selected' : '' }}>Yayasan</option>
+                                <option value="Sekolah" {{ $elektronik->asal_usul == 'Sekolah' ? 'selected' : '' }}>Sekolah</option>
+                                <option value="JPS Guru" {{ $elektronik->asal_usul == 'JPS Guru' ? 'selected' : '' }}>JPS Guru</option>
+                                <option value="SPP" {{ $elektronik->asal_usul == 'SPP' ? 'selected' : '' }}>SPP</option>
                             </select>
 
                             <select class="form-control" name="cara_peroleh">
                                 <option value="">-- Pilih Cara Peroleh --</option>
-                                <option value="Toko Langsung" {{ $elektronik->cara_peroleh == 'Toko Langsung' ? 'selected' : '' }}>Toko Langsung</option>
-                                <option value="Lelang" {{ $elektronik->cara_peroleh == 'Lelang' ? 'selected' : '' }}>Lelang</option>
-                                <option value="Donatur" {{ $elektronik->cara_peroleh == 'Donatur' ? 'selected' : '' }}>Donatur</option>
-                                <option value="Dinas Pendidikan" {{ $elektronik->cara_peroleh == 'Dinas Pendidikan' ? 'selected' : '' }}>Dinas Pendidikan</option>
+                                <option value="Beli" {{ $elektronik->cara_peroleh == 'Beli' ? 'selected' : '' }}>Beli</option>
+                                <option value="Sekolah" {{ $elektronik->cara_peroleh == 'Sekolah' ? 'selected' : '' }}>Sekolah</option>
+                                <option value="Yayasan" {{ $elektronik->cara_peroleh == 'Yayasan' ? 'selected' : '' }}>Yayasan</option>
+                                <option value="Hadiah" {{ $elektronik->cara_peroleh == 'Hadiah' ? 'selected' : '' }}>Hadiah</option>
                             </select>
                             
                             <label for="jumlah_brg">Jumlah Barang</label>

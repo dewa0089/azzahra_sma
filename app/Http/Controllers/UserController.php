@@ -109,4 +109,15 @@ public function restore($id)
     return redirect()->route('user.index')->with('success', 'Data User berhasil direstore');
 }
 
+ public function forceDelete($id)
+{
+    $user = User::withTrashed()->findOrFail($id);
+    $nama = $user->name;
+    $user->forceDelete();
+
+    ActivityHelper::log('Hapus Permanen User', 'User dengan nama ' . $nama . ' dihapus permanen');
+
+    return redirect()->route('user.trash')->with('success', 'User dihapus secara permanen.');
+}
+
 }

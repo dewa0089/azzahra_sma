@@ -89,23 +89,27 @@ class BarangController extends Controller
         return redirect()->route('barang.index')->with('success', 'Data Barang berhasil diupdate');
     }
 
-    public function destroy($id)
-    {
+   public function destroy($id)
+{
     try {
         $barang = Barang::findOrFail($id);
+
+        // Cek apakah barang masih digunakan
+        if ($barang->peminjaman()->exists() || $barang->pengembalian()->exists()) {
+            return redirect()->route('barang.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan dipeminjaman atau pengembalian.');
+        }
+
         $nama = $barang->nama_barang;
         $barang->delete();
 
-        // Simpan riwayat
         ActivityHelper::log('Hapus Barang', 'Inventaris Barang Kecil dengan nama ' . $nama . ' berhasil dihapus');
 
         return redirect()->route('barang.index')->with('success', 'Data Barang berhasil dihapus');
-    } catch (\Illuminate\Database\QueryException $e) {
-        return redirect()->route('barang.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
     } catch (\Exception $e) {
         return redirect()->route('barang.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
     }
-    }
+}
+
 
     public function trash()
 {
@@ -121,6 +125,17 @@ public function restore($id)
     ActivityHelper::log('Restore Barang', 'Barang ' . $barang->nama_barang . ' berhasil direstore');
 
     return redirect()->route('barang.index')->with('success', 'Barang berhasil direstore');
+}
+
+ public function forceDelete($id)
+{
+    $barang = Barang::withTrashed()->findOrFail($id);
+    $nama = $barang->nama_barang;
+    $barang->forceDelete();
+
+    ActivityHelper::log('Hapus Permanen Barang', 'Barang Pendukung ' . $nama . ' dihapus permanen');
+
+    return redirect()->route('barang.trash')->with('success', 'Barang dihapus secara permanen.');
 }
 
 

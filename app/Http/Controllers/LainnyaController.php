@@ -93,21 +93,29 @@ class LainnyaController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
-            $lainnya = Lainnya::findOrFail($id);
-            $nama = $lainnya->nama_barang;
-            $lainnya->delete(); // soft delete
+{
+    try {
+        $lainnya = Lainnya::findOrFail($id);
 
-            ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Lainnya dengan nama ' . $nama . ' berhasil dihapus');
-
-            return redirect()->route('lainnya.index')->with('success', 'Data Barang berhasil dihapus');
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->route('lainnya.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
-        } catch (\Exception $e) {
-            return redirect()->route('lainnya.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
+        // Cek apakah digunakan di tabel rusak
+        if ($lainnya->rusak()->exists()) {
+            return redirect()->route('lainnya.index')
+                ->with('error', 'Data tidak dapat dihapus karena digunakan di data barang rusak.');
         }
+
+        $nama = $lainnya->nama_barang;
+        $lainnya->delete(); // soft delete
+
+        ActivityHelper::log('Hapus Barang', 'Inventaris Barang Besar Lainnya dengan nama ' . $nama . ' berhasil dihapus');
+
+        return redirect()->route('lainnya.index')->with('success', 'Data Barang berhasil dihapus');
+    } catch (\Illuminate\Database\QueryException $e) {
+        return redirect()->route('lainnya.index')->with('error', 'Data tidak dapat dihapus karena masih digunakan.');
+    } catch (\Exception $e) {
+        return redirect()->route('lainnya.index')->with('error', 'Terjadi kesalahan saat menghapus data.');
     }
+}
+
 
     public function trash()
     {
@@ -124,4 +132,15 @@ class LainnyaController extends Controller
 
         return redirect()->route('lainnya.index')->with('success', 'Barang berhasil direstore');
     }
+
+     public function forceDelete($id)
+{
+    $lainnya = Lainnya::withTrashed()->findOrFail($id);
+    $nama = $lainnya->nama_barang;
+    $lainnya->forceDelete();
+
+    ActivityHelper::log('Hapus Permanen Barang', 'Barang Lainnya' . $nama . ' dihapus permanen');
+
+    return redirect()->route('lainnya.trash')->with('success', 'Barang dihapus secara permanen.');
+}
 }

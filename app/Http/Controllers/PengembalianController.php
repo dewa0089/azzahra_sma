@@ -7,6 +7,8 @@ use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use App\Helpers\ActivityHelper;
 use App\Models\User;
+use Google\Auth\Credentials\ServiceAccountCredentials;
+use Illuminate\Support\Facades\Storage;
 
 class PengembalianController extends Controller
 {
@@ -87,6 +89,12 @@ class PengembalianController extends Controller
         'Pengembalian untuk Inventaris Barang Kecil dengan nama ' . $pengembalian->peminjaman->barang->nama_barang . ' telah diajukan.'
     );
 
+    $this->sendPushNotificationToAdmins(
+    'Pengajuan Pengembalian Baru',
+    'oleh ' . auth()->user()->name . ' atas barang ' . $pengembalian->peminjaman->barang->nama_barang
+);
+
+
     return redirect()->route('pengembalian.index')->with('success', 'Pengajuan pengembalian berhasil diajukan.');
 }
 
@@ -142,6 +150,95 @@ class PengembalianController extends Controller
             'Pengembalian untuk Inventaris Barang Kecil dengan nama ' . $barang->nama_barang . ' telah disetujui. Stok dan status diperbarui.'
         );
 
+        $user = $pengembalian->peminjaman->user;
+if ($user && $user->fcm_token) {
+    $this->sendPushNotificationToUser(
+        $user->fcm_token,
+        'Pengembalian Anda Disetujui',
+        'Pengembalian untuk barang ' . $barang->nama_barang . ' telah disetujui oleh admin.'
+    );
+}
+
         return redirect()->route('pengembalian.index')->with('success', 'Pengembalian disetujui dan data barang diperbarui.');
     }
+
+    private function sendPushNotificationToAdmins($title, $body)
+{
+    $keyFile = storage_path('app/firebase-service-account.json');
+
+    $credentials = new \Google\Auth\Credentials\ServiceAccountCredentials(
+        'https://www.googleapis.com/auth/firebase.messaging',
+        $keyFile
+    );
+
+    $authToken = $credentials->fetchAuthToken();
+    $accessToken = $authToken['access_token'];
+
+    $projectId = 'inventarissekolah-c84fc';
+    $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+    $tokens = \App\Models\User::whereIn('role', ['A', 'K', 'W'])
+        ->whereNotNull('fcm_token')
+        ->pluck('fcm_token')
+        ->toArray();
+
+    $client = new \GuzzleHttp\Client();
+
+    foreach ($tokens as $token) {
+        $message = [
+            "message" => [
+                "token" => $token,
+                "notification" => [
+                    "title" => $title,
+                    "body" => $body,
+                ],
+            ]
+        ];
+
+        $client->post($url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $message,
+        ]);
+    }
+}
+
+private function sendPushNotificationToUser($token, $title, $body)
+{
+    $keyFile = storage_path('app/firebase-service-account.json');
+
+    $credentials = new \Google\Auth\Credentials\ServiceAccountCredentials(
+        'https://www.googleapis.com/auth/firebase.messaging',
+        $keyFile
+    );
+
+    $authToken = $credentials->fetchAuthToken();
+    $accessToken = $authToken['access_token'];
+
+    $projectId = 'inventarissekolah-c84fc';
+    $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+    $message = [
+        "message" => [
+            "token" => $token,
+            "notification" => [
+                "title" => $title,
+                "body" => $body,
+            ],
+        ]
+    ];
+
+    $client = new \GuzzleHttp\Client();
+    $client->post($url, [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ],
+        'json' => $message,
+    ]);
+}
+
+
 }

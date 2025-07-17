@@ -13,14 +13,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-    console.log('[firebase-messaging-sw.js] Message received: ', payload);
+// messaging.onBackgroundMessage(function(payload) {
+//     console.log('[firebase-messaging-sw.js] Message received: ', payload);
 
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/images/logo.jpeg' // sesuaikan dengan icon Anda
-    };
+//     const notificationTitle = payload.notification.title;
+//     const notificationOptions = {
+//         body: payload.notification.body,
+//         icon: '/images/logo.jpeg' // sesuaikan dengan icon Anda
+//     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
-});
+//     self.registration.showNotification(notificationTitle, notificationOptions);
+// });

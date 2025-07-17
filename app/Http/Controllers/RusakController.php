@@ -8,6 +8,9 @@ use App\Models\Mobiler;
 use App\Models\Lainnya;
 use Illuminate\Http\Request;
 use App\Helpers\ActivityHelper;
+use App\Models\Pemusnaan;
+use App\Models\Perbaikan;
+
 
 class RusakController extends Controller
 {
@@ -130,7 +133,14 @@ public function index()
     public function destroy($id)
 {
     try {
-        $rusak = Rusak::findOrFail($id);
+        $rusak = Rusak::with(['pemusnahan', 'perbaikan'])->findOrFail($id);
+
+        // Cegah penghapusan jika digunakan
+        if ($rusak->pemusnahan || $rusak->perbaikan) {
+            return redirect()->route('rusak.index')
+                ->with('error', 'Data tidak bisa dihapus karena sudah digunakan dalam pemusnahan atau perbaikan.');
+        }
+
         $jumlahRusak = $rusak->jumlah_brg_rusak;
 
         // Kembalikan jumlah barang ke inventaris
@@ -163,16 +173,11 @@ public function index()
 
         return redirect()->route('rusak.index')->with('success', 'Data Rusak berhasil dihapus dan jumlah barang dikembalikan.');
 
-    } catch (\Illuminate\Database\QueryException $e) {
-        if ($e->getCode() == 23000) {
-            return redirect()->route('rusak.index')->with('delete_error', 'Data tidak bisa dihapus karena sudah digunakan dalam pemusnaan.');
-        }
-
-        return redirect()->route('rusak.index')->with('delete_error', 'Terjadi kesalahan saat menghapus data.');
     } catch (\Exception $e) {
-        return redirect()->route('rusak.index')->with('delete_error', 'Terjadi error: ' . $e->getMessage());
+        return redirect()->route('rusak.index')->with('error', 'Terjadi error: ' . $e->getMessage());
     }
 }
+
 
 public function trash()
 {
@@ -209,6 +214,36 @@ public function restore($id)
     ActivityHelper::log('Restore Barang Rusak', 'Data barang rusak dengan ID ' . $id . ' berhasil direstore.');
 
     return redirect()->route('rusak.index')->with('success', 'Data barang rusak berhasil direstore.');
+}
+
+ public function forceDelete($id)
+{
+    $rusak = Rusak::withTrashed()->findOrFail($id);
+
+    // Ambil nama barang dari model terkait
+    $nama = 'Tidak diketahui';
+
+    if ($rusak->jenis_brg_rusak === 'elektronik' && $rusak->elektronik_id) {
+        $barang = Elektronik::withTrashed()->find($rusak->elektronik_id);
+        $nama = $barang ? $barang->nama_barang : $nama;
+    } elseif ($rusak->jenis_brg_rusak === 'mobiler' && $rusak->mobiler_id) {
+        $barang = Mobiler::withTrashed()->find($rusak->mobiler_id);
+        $nama = $barang ? $barang->nama_barang : $nama;
+    } elseif ($rusak->jenis_brg_rusak === 'lainnya' && $rusak->lainnya_id) {
+        $barang = Lainnya::withTrashed()->find($rusak->lainnya_id);
+        $nama = $barang ? $barang->nama_barang : $nama;
+    }
+
+    // Hapus gambar jika masih ada di server
+    if ($rusak->gambar_brg_rusak && file_exists(public_path('gambar/' . $rusak->gambar_brg_rusak))) {
+        unlink(public_path('gambar/' . $rusak->gambar_brg_rusak));
+    }
+
+    $rusak->forceDelete();
+
+    ActivityHelper::log('Hapus Permanen Barang Rusak', ucfirst($rusak->jenis_brg_rusak) . ' ' . $nama . ' dihapus permanen dari data rusak.');
+
+    return redirect()->route('rusak.trash')->with('success', 'Data barang rusak berhasil dihapus permanen.');
 }
 
 

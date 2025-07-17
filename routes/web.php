@@ -102,15 +102,24 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/user/trash', [UserController::class, 'trash'])->name('user.trash');
         Route::put('/user/restore/{id}', [UserController::class, 'restore'])->name('user.restore');
 
-        Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
+        Route::delete('/elektronik/permanen-delete/{id}', [ElektronikController::class, 'forceDelete'])->name('elektronik.forceDelete');
+        Route::delete('/mobiler/permanen-delete/{id}', [MobilerController::class, 'forceDelete'])->name('mobiler.forceDelete');
+        Route::delete('/lainnya/permanen-delete/{id}', [LainnyaController::class, 'forceDelete'])->name('lainnya.forceDelete');
+        Route::delete('/barang/permanen-delete/{id}', [BarangController::class, 'forceDelete'])->name('barang.forceDelete');
+        Route::delete('/user/permanen-delete/{id}', [UserController::class, 'forceDelete'])->name('user.forceDelete');
+        Route::delete('/rusak/permanen-delete/{id}', [RusakController::class, 'forceDelete'])->name('rusak.forceDelete');
 
-        Route::post('/save-token', [NotificationController::class, 'saveToken'])->name('save.token');
+
 
 
     });
 
+    
+
     // Semua Role
     Route::middleware('checkRole:A,U,K,W')->group(function () {
         Route::resource('history', HistorieController::class);
+        Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
+        Route::post('/save-token', [NotificationController::class, 'saveToken'])->name('save.token');
     });
 });

@@ -291,7 +291,7 @@
 
         messaging.onMessage(function (payload) {
             console.log('Notifikasi diterima:', payload);
-            alert(payload.notification.title + "\n" + payload.notification.body);
+            toastr.info(payload.notification.body, payload.notification.title);
         });
 
     } else {
