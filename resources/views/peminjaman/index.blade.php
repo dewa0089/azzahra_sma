@@ -25,7 +25,7 @@
 
         {{-- Form Filter --}}
        {{-- Form Filter --}}
-@if(in_array(Auth::user()->role, ['A']))
+@if(in_array(Auth::user()->role, ['A', 'K']))
 <form method="GET" action="{{ route('peminjaman.index') }}" class="mb-4">
   <div class="row">
     <div class="col-md-4">

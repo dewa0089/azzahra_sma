@@ -35,14 +35,14 @@ Route::post('logout', [LoginController::class, 'logout'])->middleware('auth')->n
 
 // Halaman utama setelah login
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'checkRole:A,U,K,W'])
+    ->middleware(['auth', 'checkRole:A,U,K'])
     ->name('dashboard');
 
 // Grup route yang memerlukan autentikasi
 Route::middleware(['auth'])->group(function () {
 
     // Role A, K, W
-    Route::middleware('checkRole:A,K,W')->group(function () {
+    Route::middleware('checkRole:A,K')->group(function () {
         Route::resource('elektronik', ElektronikController::class)->except(['show']);
         Route::resource('lainnya', LainnyaController::class)->except(['show']);
         Route::resource('mobiler', MobilerController::class)->except(['show']);
@@ -109,15 +109,12 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/user/permanen-delete/{id}', [UserController::class, 'forceDelete'])->name('user.forceDelete');
         Route::delete('/rusak/permanen-delete/{id}', [RusakController::class, 'forceDelete'])->name('rusak.forceDelete');
 
-
-
-
     });
 
     
 
     // Semua Role
-    Route::middleware('checkRole:A,U,K,W')->group(function () {
+    Route::middleware('checkRole:A,U,K')->group(function () {
         Route::resource('history', HistorieController::class);
         Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
         Route::post('/save-token', [NotificationController::class, 'saveToken'])->name('save.token');

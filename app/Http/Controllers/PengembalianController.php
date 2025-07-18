@@ -19,7 +19,7 @@ class PengembalianController extends Controller
 
     $query = Pengembalian::with(['peminjaman.barang']);
 
-    if (in_array($user->role, ['A', 'K', 'W'])) {
+    if (in_array($user->role, ['A', 'K'])) {
         // Filter nama_peminjam jika dikirim
         if ($request->filled('nama_peminjam')) {
             $query->whereHas('peminjaman', function ($q) use ($request) {
@@ -177,7 +177,7 @@ if ($user && $user->fcm_token) {
     $projectId = 'inventarissekolah-c84fc';
     $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
 
-    $tokens = \App\Models\User::whereIn('role', ['A', 'K', 'W'])
+    $tokens = \App\Models\User::whereIn('role', ['A', 'K'])
         ->whereNotNull('fcm_token')
         ->pluck('fcm_token')
         ->toArray();

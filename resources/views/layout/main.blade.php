@@ -33,7 +33,7 @@
             <span class="menu-title">Dashboard</span>
           </a>
         </li>
-        @if(in_array(Auth::user()->role, ['A', 'K', 'W']))
+        @if(in_array(Auth::user()->role, ['A', 'K']))
         <li class="nav-item">
           <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
             <i class="mdi mdi-palette menu-icon"></i>
@@ -115,11 +115,11 @@
           </a>
         </li>
         @endif
-        @if(in_array(Auth::user()->role, ['A', 'K', 'W']))
+        @if(in_array(Auth::user()->role, ['A', 'K']))
         <li class="nav-item">
           <a class="nav-link" href="{{ url('laporan') }}">
             <i class="mdi mdi-file-chart menu-icon"></i>
-            <span class="menu-title">Laporan Barang</span>
+            <span class="menu-title">Laporan</span>
           </a>
         </li>
         @endif

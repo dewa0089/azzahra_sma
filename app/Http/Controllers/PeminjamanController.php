@@ -24,8 +24,7 @@ class PeminjamanController extends Controller
         ->orderByRaw("CASE WHEN status = 'Menunggu Persetujuan' THEN 0 ELSE 1 END")
         ->orderBy('created_at', 'desc');
 
-    if (in_array($user->role, ['A', 'K', 'W'])) {
-        // Jika admin, kepala, wakil => bisa filter berdasarkan nama peminjam
+    if (in_array($user->role, ['A', 'K'])) {
         if ($request->filled('nama_peminjam')) {
             $query->where('nama_peminjam', $request->nama_peminjam);
         }
@@ -232,7 +231,7 @@ if ($user && $user->fcm_token) {
     $projectId = 'inventarissekolah-c84fc'; // Ganti dengan Project ID kamu
     $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
 
-    $tokens = User::whereIn('role', ['A', 'K', 'W'])
+    $tokens = User::whereIn('role', ['A', 'K'])
         ->whereNotNull('fcm_token')
         ->pluck('fcm_token')
         ->toArray();

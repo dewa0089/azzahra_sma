@@ -28,7 +28,6 @@
                                 <option value="A">Admin</option>
                                 <option value="U">User</option>
                                 <option value="K">Kepala Sekolah</option>
-                                <option value="W">Wakil Kepala Sekolah</option>
                             </select>
 
                             <br>

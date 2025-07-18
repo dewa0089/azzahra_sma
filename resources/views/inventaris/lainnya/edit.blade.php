@@ -37,18 +37,18 @@
 
                             <select class="form-control" name="asal_usul">
                                 <option value="">-- Pilih Asal Usul --</option>
-                                <option value="Yayasan" {{ $elektronik->asal_usul == 'Yayasan' ? 'selected' : '' }}>Yayasan</option>
-                                <option value="Sekolah" {{ $elektronik->asal_usul == 'Sekolah' ? 'selected' : '' }}>Sekolah</option>
-                                <option value="JPS Guru" {{ $elektronik->asal_usul == 'JPS Guru' ? 'selected' : '' }}>JPS Guru</option>
-                                <option value="SPP" {{ $elektronik->asal_usul == 'SPP' ? 'selected' : '' }}>SPP</option>
+                                <option value="Yayasan" {{ $lainnya->asal_usul == 'Yayasan' ? 'selected' : '' }}>Yayasan</option>
+                                <option value="Sekolah" {{ $lainnya->asal_usul == 'Sekolah' ? 'selected' : '' }}>Sekolah</option>
+                                <option value="JPS Guru" {{ $lainnya->asal_usul == 'JPS Guru' ? 'selected' : '' }}>JPS Guru</option>
+                                <option value="SPP" {{ $lainnya->asal_usul == 'SPP' ? 'selected' : '' }}>SPP</option>
                             </select>
 
                             <select class="form-control" name="cara_peroleh">
                                 <option value="">-- Pilih Cara Peroleh --</option>
-                                <option value="Beli" {{ $elektronik->cara_peroleh == 'Beli' ? 'selected' : '' }}>Beli</option>
-                                <option value="Sekolah" {{ $elektronik->cara_peroleh == 'Sekolah' ? 'selected' : '' }}>Sekolah</option>
-                                <option value="Yayasan" {{ $elektronik->cara_peroleh == 'Yayasan' ? 'selected' : '' }}>Yayasan</option>
-                                <option value="Hadiah" {{ $elektronik->cara_peroleh == 'Hadiah' ? 'selected' : '' }}>Hadiah</option>
+                                <option value="Beli" {{ $lainnya->cara_peroleh == 'Beli' ? 'selected' : '' }}>Beli</option>
+                                <option value="Sekolah" {{ $lainnya->cara_peroleh == 'Sekolah' ? 'selected' : '' }}>Sekolah</option>
+                                <option value="Yayasan" {{ $lainnya->cara_peroleh == 'Yayasan' ? 'selected' : '' }}>Yayasan</option>
+                                <option value="Hadiah" {{ $lainnya->cara_peroleh == 'Hadiah' ? 'selected' : '' }}>Hadiah</option>
                             </select>
                             
                             <label for="jumlah_brg">Jumlah Barang</label>

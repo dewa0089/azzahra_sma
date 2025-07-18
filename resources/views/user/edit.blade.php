@@ -36,7 +36,6 @@
                                 <option value="A" {{ $user->role == 'A' ? 'selected' : '' }}>Admin</option>
                                 <option value="U" {{ $user->role == 'U' ? 'selected' : '' }}>User</option>
                                 <option value="K" {{ $user->role == 'K' ? 'selected' : '' }}>Kepala Sekolah</option>
-                                <option value="W" {{ $user->role == 'W' ? 'selected' : '' }}>Wakil Kepala Sekolah</option>
                             </select>
 
 

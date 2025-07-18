@@ -42,7 +42,6 @@
                       @case('A') Admin @break
                       @case('U') User @break
                       @case('K') Kepala Sekolah @break
-                      @case('W') Wakil Kepala Sekolah @break
                       @default Tidak Diketahui
                   @endswitch
                 </td>

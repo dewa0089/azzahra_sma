@@ -70,7 +70,7 @@
       }
     }
   </style>
-  <link rel="icon" href="{{ asset('images/favicon.png') }}">
+  <link rel="icon" href="{{ asset('images/logo.jpeg') }}">
 </head>
 <body>
   <div class="form-group">

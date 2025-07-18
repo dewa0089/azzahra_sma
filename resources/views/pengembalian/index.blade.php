@@ -14,7 +14,7 @@
         </div>
 
         {{-- Form Filter Nama Peminjam --}}
-        @if(isset($users) && in_array(Auth::user()->role, ['A', 'K', 'W']))
+        @if(isset($users) && in_array(Auth::user()->role, ['A', 'K']))
         <form method="GET" action="{{ route('pengembalian.index') }}" class="mb-4">
           <div class="row">
             <div class="col-md-4">
